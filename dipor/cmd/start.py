@@ -157,18 +157,13 @@ class EntryPointCommands:
         self.build_public(os.path.join(self.dst_root, app_name, 'src'), os.path.join(self.dst_root, app_name, 'content'), os.path.join(self.dst_root, app_name, 'settings.py'), os.path.join(self.dst_root, app_name, 'public'))
         self.serve_public(app_name)
 
-        # create src
-        # create content
-        # create settings
-        # create a hello dipor barren page
-        # build to create single page
-
 
     def soft_build(self, *args, **kwargs):
         print("running dev")
-        # get the content
-        # get the src
-        # convert to public
+        self.build_public(os.path.join(self.dst_root, 'src'), os.path.join(self.dst_root, 'content'), os.path.join(self.dst_root, 'settings.py'), os.path.join(self.dst_root, 'public'))
+        if args[0]:
+            if args[0][0] == "serve":
+                self.serve_public('')
 
     def hard_build(self, *args, **kwargs):
         print("running build")
