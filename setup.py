@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='dipor',
-    version='0.1.0',
+    version='0.1.1',
     description='Static Site Generator written in Python for ease of processes',
     url="https://github.com/vidhibagadia/dipor",
     author="Vidh Bagadia",
