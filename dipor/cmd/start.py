@@ -48,9 +48,6 @@ class EntryPointCommands:
 
     
     def copy_file(self, src, dst, file):
-        '''
-        is buggy!
-        '''
         try:
             shutil.copy(os.path.join(src, file), os.path.join(dst, file))
         except FileExistsError:
@@ -110,7 +107,7 @@ class EntryPointCommands:
         }
 
         SETTINGS.update(additional_settings)
-        settings_path = os.path.join(self.get_dst_root, app_name, "dipor_settings.py")
+        settings_path = os.path.join(self.dst_root, app_name, "dipor_settings.py")
         with open(settings_path, "w") as f:
             for key, val in SETTINGS.items():
                 f.write(f"{key} = {val}\n")
@@ -123,9 +120,10 @@ class EntryPointCommands:
 
         print ("running quikcstart")
         print("Getting the /src directory...")
-        self.copy_tree(self.src_root, os.path.join(self.dst_root, app_name), 'src')
+        starters_route = os.path.join('starters', 'quickstart')
+        self.copy_tree(os.path.join(self.src_root, starters_route), os.path.join(self.dst_root, app_name), 'src')
         print("Getting the /content directory...")
-        self.copy_tree(self.src_root, os.path.join(self.dst_root, app_name), 'content')
+        self.copy_tree(os.path.join(self.src_root, starters_route), os.path.join(self.dst_root, app_name), 'content')
         print("Getting the settings file...")
         settings = {
             'DIPOR_SOURCE_ROOT': f"'{os.path.join(app_name, 'src')}'",
@@ -143,7 +141,6 @@ class EntryPointCommands:
             app_name = args[0][0]
             
         print("running bigbang")
-        # os.mkdir("project directory")
         os.mkdir(os.path.join(self.dst_root, app_name, 'src'))
         os.mkdir(os.path.join(self.dst_root, app_name, 'content'))
         settings = {
