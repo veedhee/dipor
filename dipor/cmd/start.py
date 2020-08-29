@@ -176,18 +176,21 @@ class EntryPointCommands:
         # serve.....done
 
     def default_action(self, *args, **kwargs):
+        '''
+        to be filled
+        '''
         print("running default action")
 
     def use_theme(self, *args, **kwargs):
         print("running use theme")
-        print(args)
         app_name = ""
         if args[0]:
             git_path = args[0][0]
             if len(args[0]) >= 2:
                 app_name = args[0][1]
-            print(f"git clone --quiet {git_path} {app_name}")
             os.system(f"git clone --quiet {git_path} {app_name}")
+            git_path = os.path.join(self.dst_root, app_name, ".git")
+            shutil.rmtree(git_path)
         else:
             print("Need a git Path")
 
