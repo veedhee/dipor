@@ -6,15 +6,8 @@ import dipor
 from dipor.main import builder_main
 from dipor.server import runserver
 
-'''
-MAIN FUNCTIONS -
-    - quickstart (the default template)
-    - bigbang (nothing is set just the src/content directories/settings)
-    - use <github-src> (to use themes from github)
-    - dipor dev [-PORT]
-    - dipor build [-NOSERVE]
-    - help (?)
-'''
+DEFAULT_PORT = 5050
+
 class EntryPointCommands:
 
     def __init__(self, args):
@@ -22,7 +15,8 @@ class EntryPointCommands:
                         'bigbang': self.bigbang,
                         'use': self.use_theme,
                         'dev': self.soft_build,
-                        'build': self.hard_build}
+                        'build': self.hard_build,
+                        'serve': self.serve_public}
 
         self.src_root = self.get_src_root
         self.dst_root = self.get_dst_root
@@ -103,6 +97,7 @@ class EntryPointCommands:
             'DIPOR_INITIAL_APP': '"/"',
             'DIPOR_EXTENSIONS': "['meta']",
             'DIPOR_FILE_FORMATS_ALLOWED': "['md', 'json']",
+            'DIPOR_PORT': f"{DEFAULT_PORT}",
             'DIPOR_PRETTIFY': "True"
         }
 
@@ -132,7 +127,7 @@ class EntryPointCommands:
         }
         self.generate_settings(app_name, settings)
         print("Building the /public repo")
-        self.build_public(os.path.join(self.dst_root, app_name, 'src'), os.path.join(self.dst_root, app_name, 'content'), os.path.join(self.dst_root, app_name, 'settings.py'), os.path.join(self.dst_root, app_name, 'public'))
+        self.build_public(os.path.join(self.dst_root, app_name, 'src'), os.path.join(self.dst_root, app_name, 'content'), os.path.join(self.dst_root, app_name, 'dipor_settings.py'), os.path.join(self.dst_root, app_name, 'public'))
         self.serve_public(app_name)
 
     def bigbang(self, *args, **kwargs):
@@ -141,52 +136,61 @@ class EntryPointCommands:
             app_name = args[0][0]
             
         print("running bigbang")
-        os.mkdir(os.path.join(self.dst_root, app_name, 'src'))
-        os.mkdir(os.path.join(self.dst_root, app_name, 'content'))
+        print("Getting the /src directory...")
+        starters_route = os.path.join('starters', 'bigbang')
+        self.copy_tree(os.path.join(self.src_root, starters_route), os.path.join(self.dst_root, app_name), 'src')
+        print("Getting the /content directory...")
+        self.copy_tree(os.path.join(self.src_root, starters_route), os.path.join(self.dst_root, app_name), 'content')
+        print("Getting the settings file...")
         settings = {
             'DIPOR_SOURCE_ROOT': f"'{os.path.join(app_name, 'src')}'",
             'DIPOR_CONTENT_ROOT': f"'{os.path.join(app_name, 'content')}'",
             'DIPOR_INITIAL_APP': f"'{app_name}'"
         }
         self.generate_settings(app_name, settings)
-        self.build_public(os.path.join(self.dst_root, app_name, 'src'), os.path.join(self.dst_root, app_name, 'content'), os.path.join(self.dst_root, app_name, 'settings.py'), os.path.join(self.dst_root, app_name, 'public'))
+        print("Building the /public repo")
+        self.build_public(os.path.join(self.dst_root, app_name, 'src'), os.path.join(self.dst_root, app_name, 'content'), os.path.join(self.dst_root, app_name, 'dipor_settings.py'), os.path.join(self.dst_root, app_name, 'public'))
         self.serve_public(app_name)
-
-        # create src
-        # create content
-        # create settings
-        # create a hello dipor barren page
-        # build to create single page
 
 
     def soft_build(self, *args, **kwargs):
         print("running dev")
-        # get the content
-        # get the src
-        # convert to public
+        self.build_public(os.path.join(self.dst_root, 'src'), os.path.join(self.dst_root, 'content'), os.path.join(self.dst_root, 'dipor_settings.py'), os.path.join(self.dst_root, 'public'))
+        if args[0]:
+            if args[0][0] == "serve":
+                self.serve_public('')
 
     def hard_build(self, *args, **kwargs):
         print("running build")
-        # clean the public folder
-        # get the directories
-        # convert to public
+        shutil.rmtree(os.path.join(self.dst_root, 'public'))
+        self.build_public(os.path.join(self.dst_root, 'src'), os.path.join(self.dst_root, 'content'), os.path.join(self.dst_root, 'dipor_settings.py'), os.path.join(self.dst_root, 'public'))
+        if args[0]:
+            if args[0][0] == "serve":
+                self.serve_public('')
+        
+        # clean the public folder......done
+        # get the directories.....done
+        # convert to public.....done
         # do post-processing (prettify/compress/make static easily available)
         # do an accessibility check
-        # serve
+        # serve.....done
 
     def default_action(self, *args, **kwargs):
+        '''
+        to be filled
+        '''
         print("running default action")
 
     def use_theme(self, *args, **kwargs):
         print("running use theme")
-        print(args)
         app_name = ""
         if args[0]:
             git_path = args[0][0]
             if len(args[0]) >= 2:
                 app_name = args[0][1]
-            print(f"git clone --quiet {git_path} {app_name}")
             os.system(f"git clone --quiet {git_path} {app_name}")
+            git_path = os.path.join(self.dst_root, app_name, ".git")
+            shutil.rmtree(git_path)
         else:
             print("Need a git Path")
 
@@ -200,8 +204,9 @@ class EntryPointCommands:
         '''
         builder_main(src_path, content_path, settings_path, public_folder)
 
-    def serve_public(self, app_name):
-        runserver(app_name)
+    def serve_public(self, *args, app_name='', port=DEFAULT_PORT):
+        settings_path = os.path.join(self.dst_root, 'dipor_settings.py')
+        runserver(app_name, settings_path)
 
 def main():
     '''
