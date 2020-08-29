@@ -141,14 +141,19 @@ class EntryPointCommands:
             app_name = args[0][0]
             
         print("running bigbang")
-        os.mkdir(os.path.join(self.dst_root, app_name, 'src'))
-        os.mkdir(os.path.join(self.dst_root, app_name, 'content'))
+        print("Getting the /src directory...")
+        starters_route = os.path.join('starters', 'bigbang')
+        self.copy_tree(os.path.join(self.src_root, starters_route), os.path.join(self.dst_root, app_name), 'src')
+        print("Getting the /content directory...")
+        self.copy_tree(os.path.join(self.src_root, starters_route), os.path.join(self.dst_root, app_name), 'content')
+        print("Getting the settings file...")
         settings = {
             'DIPOR_SOURCE_ROOT': f"'{os.path.join(app_name, 'src')}'",
             'DIPOR_CONTENT_ROOT': f"'{os.path.join(app_name, 'content')}'",
             'DIPOR_INITIAL_APP': f"'{app_name}'"
         }
         self.generate_settings(app_name, settings)
+        print("Building the /public repo")
         self.build_public(os.path.join(self.dst_root, app_name, 'src'), os.path.join(self.dst_root, app_name, 'content'), os.path.join(self.dst_root, app_name, 'settings.py'), os.path.join(self.dst_root, app_name, 'public'))
         self.serve_public(app_name)
 
