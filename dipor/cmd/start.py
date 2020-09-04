@@ -204,7 +204,7 @@ class EntryPointCommands:
         '''
         builder_main(src_path, content_path, settings_path, public_folder)
 
-    def serve_public(self, *args, app_name='', port=DEFAULT_PORT):
+    def serve_public(self, app_name='', port=DEFAULT_PORT):
         settings_path = os.path.join(self.dst_root, 'dipor_settings.py')
         runserver(app_name, settings_path)
 
