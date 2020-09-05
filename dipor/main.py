@@ -15,7 +15,7 @@ RESERVED_PATHS = ['_components', '_assets', '_branches']
 src_path = ''
 content_path = ''
 settings_path = ''
-
+STRUCTURAL_CTX = {}
 
 def get_current_context(dir_path):
     extensions_tuple = ('.md', '.json')
@@ -67,9 +67,10 @@ def get_content_branch_dirs(current_app_path):
     return branch_dirs
 
 
-def get_total_context(initial_context, current_context, app_name):
+def get_total_context(initial_context, current_context):
     global settings_path
-    STRUCTURAL_CTX = get_structural_context(settings['DIPOR_PREFIX'], app_name, settings['DIPOR_CONTENT_ROOT'])
+    global STRUCTURAL_CTX
+    # STRUCTURAL_CTX = get_structural_context(settings['DIPOR_PREFIX'], app_name, settings['DIPOR_CONTENT_ROOT'])
     current_common_ctx = {'common': {}}
     if initial_context.get('common'):
         current_common_ctx['common'].update(initial_context['common'])
@@ -89,9 +90,7 @@ def builder(current_app_path, current_content_path, public_folder, initial_conte
         content_branch_dirs = get_content_branch_dirs(current_app_path)
         for dir_path in content_branch_dirs:
             current_context = get_current_context(dir_path)
-            total_ctx = get_total_context(initial_context, current_context, settings['DIPOR_INITIAL_APP'])
-            # print("inside branch:")
-            # print(total_ctx)
+            total_ctx = get_total_context(initial_context, current_context)
 
             main_template = os.path.join(current_app_path, 'index.html')
             if os.path.isfile(main_template):
@@ -107,7 +106,7 @@ def builder(current_app_path, current_content_path, public_folder, initial_conte
 
     else:
         current_context = get_current_context(current_content_path)
-        total_ctx = get_total_context(initial_context, current_context, settings['DIPOR_INITIAL_APP'])
+        total_ctx = get_total_context(initial_context, current_context)
 
         main_template = os.path.join(current_app_path, 'index.html')
         if os.path.isfile(main_template):
@@ -146,6 +145,7 @@ def builder_main(current_app_path, current_content_path, settings_path_user, pub
     global content_path
     global settings_path
     global settings
+    global STRUCTURAL_CTX
     settings_path = settings_path_user
     src_path = current_app_path
     content_path = current_content_path
@@ -153,4 +153,5 @@ def builder_main(current_app_path, current_content_path, settings_path_user, pub
     import dipor_settings
     settings_tmp = dipor_settings.instance
     settings = { key: settings_tmp[key] for key in settings_tmp.keys() if key.startswith("DIPOR_")}
+    STRUCTURAL_CTX = get_structural_context(settings['DIPOR_PREFIX'], settings['DIPOR_INITIAL_APP'], settings['DIPOR_CONTENT_ROOT'])
     builder(src_path, content_path, public_folder)
