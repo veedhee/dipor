@@ -67,9 +67,9 @@ def get_content_branch_dirs(current_app_path):
     return branch_dirs
 
 
-def get_total_context(initial_context, current_context):
+def get_total_context(initial_context, current_context, app_name):
     global settings_path
-    STRUCTURAL_CTX = get_structural_context(settings['DIPOR_CONTENT_ROOT'])
+    STRUCTURAL_CTX = get_structural_context(settings['DIPOR_PREFIX'], app_name, settings['DIPOR_CONTENT_ROOT'])
     current_common_ctx = {'common': {}}
     if initial_context.get('common'):
         current_common_ctx['common'].update(initial_context['common'])
@@ -89,7 +89,9 @@ def builder(current_app_path, current_content_path, public_folder, initial_conte
         content_branch_dirs = get_content_branch_dirs(current_app_path)
         for dir_path in content_branch_dirs:
             current_context = get_current_context(dir_path)
-            total_ctx = get_total_context(initial_context, current_context)
+            total_ctx = get_total_context(initial_context, current_context, settings['DIPOR_INITIAL_APP'])
+            # print("inside branch:")
+            # print(total_ctx)
 
             main_template = os.path.join(current_app_path, 'index.html')
             if os.path.isfile(main_template):
@@ -105,7 +107,7 @@ def builder(current_app_path, current_content_path, public_folder, initial_conte
 
     else:
         current_context = get_current_context(current_content_path)
-        total_ctx = get_total_context(initial_context, current_context)
+        total_ctx = get_total_context(initial_context, current_context, settings['DIPOR_INITIAL_APP'])
 
         main_template = os.path.join(current_app_path, 'index.html')
         if os.path.isfile(main_template):
