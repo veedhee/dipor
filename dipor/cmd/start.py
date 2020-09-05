@@ -92,6 +92,7 @@ class EntryPointCommands:
         the default values, override if something already present
         '''
         SETTINGS = {
+            'DIPOR_PREFIX': f"'{self.dst_root}'",
             'DIPOR_SOURCE_ROOT': '"src/"',
             'DIPOR_CONTENT_ROOT': '"content/"',
             'DIPOR_INITIAL_APP': '"/"',
