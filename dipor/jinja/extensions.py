@@ -27,9 +27,9 @@ class RoutesExtension(Extension):
         if not current:
             for k, v in routes.items():
                 if not v[1]:
-                    html += f"<li><a href='{v[0]}'>"+k+"</a></li>"
+                    html += f"<li><a href='{k}'>"+v[0]+"</a></li>"
                 else:
-                    html += f"<li><a href='{v[0]}'>"+k+"<ul>"
+                    html += f"<li><a href='{k}'>"+v[0]+"<ul>"
                     html = self.__generate_routes(v[1], current, html, is_subpath=True)
             if is_subpath:
                 html += "</ul></li>"

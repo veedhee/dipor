@@ -23,16 +23,20 @@ def get_structural_context(prefix, app_name, content_root):
     return processed_path
 
 def process_paths(directory, prefix="", is_subpath=False):
+    ## this is the default path. allow overriding later
+    route_dir = {}
     for k, v in directory.items():
         if not v:
-            directory[k] = (prefix+"/"+k, None)
+            # directory[k] = (prefix+"/"+k, None)
+            route_dir[prefix+"/"+k] = (k, None)
         else:
             sub_paths = process_paths(v, prefix="/"+k, is_subpath=True)
-            directory[k] =("/"+k, sub_paths)
+            # directory[k] =("/"+k, sub_paths)
+            route_dir["/"+k] = (k, sub_paths)
     if is_subpath:
-        return directory
+        return route_dir
 
-    final_route = {'home': ('/', directory)}
+    final_route = {'/': ('home', route_dir)}
     return final_route
 
         
