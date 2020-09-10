@@ -1,4 +1,4 @@
-#0.2.1
+#0.2.0
 _[ not for production ]_
 - Fixes: Fix `dev` command not working inside the project directory
 - Add SETTINGS: `DIPOR_PREFIX` (to help specify the base path of the project)
