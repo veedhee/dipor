@@ -9,11 +9,9 @@ import webbrowser
 
 def runserver(app_name, settings_path):
     sys.path.append(os.path.dirname(settings_path))
-    print(settings_path)
     import dipor_settings
     settings_tmp = dipor_settings.instance
     settings = { key: settings_tmp[key] for key in settings_tmp.keys() if key.startswith("DIPOR_")}
-    print(settings)
     PORT = settings['DIPOR_PORT']
     web_dir = os.path.join(pathlib.Path().absolute(), app_name, 'public')
     os.chdir(web_dir)

@@ -15,7 +15,8 @@ RESERVED_PATHS = ['_components', '_assets', '_branches']
 src_path = ''
 content_path = ''
 settings_path = ''
-
+settings = {}
+STRUCTURAL_CTX = {}
 
 def get_current_context(dir_path):
     extensions_tuple = ('.md', '.json')
@@ -30,9 +31,10 @@ def get_current_context(dir_path):
     return current_ctx   
     
 
-def load_template(tpl_path):
-    env = RelEnvironment(loader=FileSystemLoader(Path(os.path.dirname(tpl_path))), undefined=SilentUndefined, extensions=[RoutesExtension])
+def load_template(tpl_path, path_to_common_tpl):
+    env = RelEnvironment(loader=FileSystemLoader([Path(os.path.dirname(tpl_path)), path_to_common_tpl]), undefined=SilentUndefined, extensions=[RoutesExtension])
     env.globals.update(zip=zip)
+    print(env.list_templates())
     template =  env.get_template('index.html')      # hard coded pls
     return template
 
@@ -59,7 +61,6 @@ def get_content_branch_dirs(current_app_path):
     global src_path
     content_path = os.path.join(Path(src_path).parent, 'content')
     current_content_path = os.path.join(content_path, os.path.relpath(current_app_path, src_path))
-    # current_content_path = 'content' + current_app_path[3:]
     for file in os.listdir(current_content_path):
         if os.path.isdir(os.path.join(current_content_path, file)):
             branch_dirs.append(os.path.join(current_content_path, file))
@@ -69,7 +70,7 @@ def get_content_branch_dirs(current_app_path):
 
 def get_total_context(initial_context, current_context):
     global settings_path
-    STRUCTURAL_CTX = get_structural_context(settings['DIPOR_CONTENT_ROOT'])
+    global STRUCTURAL_CTX
     current_common_ctx = {'common': {}}
     if initial_context.get('common'):
         current_common_ctx['common'].update(initial_context['common'])
@@ -93,7 +94,8 @@ def builder(current_app_path, current_content_path, public_folder, initial_conte
 
             main_template = os.path.join(current_app_path, 'index.html')
             if os.path.isfile(main_template):
-                loaded_tpl = load_template(main_template)
+                path_to_common_tpl = os.path.join(settings['DIPOR_PREFIX'], settings['DIPOR_SOURCE_ROOT'], '_common')
+                loaded_tpl = load_template(main_template, path_to_common_tpl=path_to_common_tpl)
                 current_sub_path = os.path.relpath(current_app_path, src_path)
                 # current_sub_path = current_app_path[3:].strip("/")
                 current_sub_path = current_sub_path.replace("_branches", "").strip("/")
@@ -109,9 +111,9 @@ def builder(current_app_path, current_content_path, public_folder, initial_conte
 
         main_template = os.path.join(current_app_path, 'index.html')
         if os.path.isfile(main_template):
-            loaded_tpl = load_template(main_template)
+            path_to_common_tpl = os.path.join(settings['DIPOR_PREFIX'], settings['DIPOR_SOURCE_ROOT'], '_common')
+            loaded_tpl = load_template(main_template, path_to_common_tpl=path_to_common_tpl)
             current_sub_path = os.path.relpath(current_app_path, src_path)
-            # current_sub_path = current_app_path[3:].strip("/")
             res_dir = os.path.join(public_folder, current_sub_path)
             pathlib.Path(res_dir).mkdir(parents=True, exist_ok=True) 
             loaded_tpl.stream(**total_ctx).dump(os.path.join(res_dir, 'index.html'))
@@ -144,6 +146,7 @@ def builder_main(current_app_path, current_content_path, settings_path_user, pub
     global content_path
     global settings_path
     global settings
+    global STRUCTURAL_CTX
     settings_path = settings_path_user
     src_path = current_app_path
     content_path = current_content_path
@@ -151,4 +154,5 @@ def builder_main(current_app_path, current_content_path, settings_path_user, pub
     import dipor_settings
     settings_tmp = dipor_settings.instance
     settings = { key: settings_tmp[key] for key in settings_tmp.keys() if key.startswith("DIPOR_")}
+    STRUCTURAL_CTX = get_structural_context(settings['DIPOR_PREFIX'], settings['DIPOR_INITIAL_APP'], settings['DIPOR_CONTENT_ROOT'])
     builder(src_path, content_path, public_folder)

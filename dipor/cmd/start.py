@@ -5,6 +5,7 @@ import sys
 import dipor
 from dipor.main import builder_main
 from dipor.server import runserver
+from dipor.utils.context import get_structural_context
 
 DEFAULT_PORT = 5050
 
@@ -92,6 +93,7 @@ class EntryPointCommands:
         the default values, override if something already present
         '''
         SETTINGS = {
+            'DIPOR_PREFIX': f"'{self.dst_root}'",
             'DIPOR_SOURCE_ROOT': '"src/"',
             'DIPOR_CONTENT_ROOT': '"content/"',
             'DIPOR_INITIAL_APP': '"/"',
@@ -107,6 +109,24 @@ class EntryPointCommands:
             for key, val in SETTINGS.items():
                 f.write(f"{key} = {val}\n")
             f.write("\n\ninstance = globals()")
+
+    def generate_routes(self, app_name):
+        '''
+        write to routes.cfg
+        '''
+        routes_path = os.path.join(self.dst_root, app_name, "routes.yml")
+        with open(routes_path, "w") as f:
+            pass
+        # routes = get_structural_context(self.dst_root, app_name, os.path.join(app_name, "content"))
+        # with open(routes_path, "w") as f:
+        #     minified_routes = self._generate_routes(routes, f)
+
+
+    # def _generate_routes(self, routes, f):
+    #     for k, v in routes.items():
+    #         f.write(k+": "+v[0]+"\n")
+    #         if v[1] is not None:
+    #             self._generate_routes(v[1], f)
     
     def quickstart(self, *args, **kwargs):
         app_name = ""
@@ -126,6 +146,7 @@ class EntryPointCommands:
             'DIPOR_INITIAL_APP': f"'{app_name}'"
         }
         self.generate_settings(app_name, settings)
+        self.generate_routes(app_name)
         print("Building the /public repo")
         self.build_public(os.path.join(self.dst_root, app_name, 'src'), os.path.join(self.dst_root, app_name, 'content'), os.path.join(self.dst_root, app_name, 'dipor_settings.py'), os.path.join(self.dst_root, app_name, 'public'))
         self.serve_public(app_name)
@@ -148,6 +169,7 @@ class EntryPointCommands:
             'DIPOR_INITIAL_APP': f"'{app_name}'"
         }
         self.generate_settings(app_name, settings)
+        self.generate_routes(app_name)
         print("Building the /public repo")
         self.build_public(os.path.join(self.dst_root, app_name, 'src'), os.path.join(self.dst_root, app_name, 'content'), os.path.join(self.dst_root, app_name, 'dipor_settings.py'), os.path.join(self.dst_root, app_name, 'public'))
         self.serve_public(app_name)
@@ -204,7 +226,7 @@ class EntryPointCommands:
         '''
         builder_main(src_path, content_path, settings_path, public_folder)
 
-    def serve_public(self, *args, app_name='', port=DEFAULT_PORT):
+    def serve_public(self, app_name='', port=DEFAULT_PORT):
         settings_path = os.path.join(self.dst_root, 'dipor_settings.py')
         runserver(app_name, settings_path)
 
