@@ -94,7 +94,7 @@ def builder(current_app_path, current_content_path, public_folder, initial_conte
 
             main_template = os.path.join(current_app_path, 'index.html')
             if os.path.isfile(main_template):
-                path_to_common_tpl = os.path.join(settings['DIPOR_PREFIX'], settings['DIPOR_SOURCE_ROOT'], '_parent_tpl')
+                path_to_common_tpl = os.path.join(settings['DIPOR_PREFIX'], settings['DIPOR_SOURCE_ROOT'], '_common')
                 loaded_tpl = load_template(main_template, path_to_common_tpl=path_to_common_tpl)
                 current_sub_path = os.path.relpath(current_app_path, src_path)
                 # current_sub_path = current_app_path[3:].strip("/")
@@ -111,7 +111,7 @@ def builder(current_app_path, current_content_path, public_folder, initial_conte
 
         main_template = os.path.join(current_app_path, 'index.html')
         if os.path.isfile(main_template):
-            path_to_common_tpl = os.path.join(settings['DIPOR_PREFIX'], settings['DIPOR_SOURCE_ROOT'], '_parent_tpl')
+            path_to_common_tpl = os.path.join(settings['DIPOR_PREFIX'], settings['DIPOR_SOURCE_ROOT'], '_common')
             loaded_tpl = load_template(main_template, path_to_common_tpl=path_to_common_tpl)
             current_sub_path = os.path.relpath(current_app_path, src_path)
             res_dir = os.path.join(public_folder, current_sub_path)

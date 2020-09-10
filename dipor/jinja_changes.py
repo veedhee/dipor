@@ -10,4 +10,4 @@ class SilentUndefined(Undefined):
 class RelEnvironment(Environment):
     """Override join_path() to enable relative template paths."""
     def join_path(self, template, parent):
-        return os.path.join(os.path.dirname(parent), template)
+        return os.path.join(os.path.dirname(parent), '_components', template)
