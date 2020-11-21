@@ -1,4 +1,5 @@
 #0.2.0
+
 _[ not for production ]_
 - Fixes: Fix `dev` command not working inside the project directory
 - Add SETTINGS: `DIPOR_PREFIX` (to help specify the base path of the project)
@@ -10,6 +11,7 @@ _[ not for production ]_
 - Feature Addition: Option to edit default route name to have customised and syntactically correct descritive text. This happend with the help of a `routes.yml` file.
 
 #0.1.1
+
 _[ not for production ]_
 - Add support for custom port when serving files
 - Add a cmd line utility `dipor bigbang [appname]` for minimal working playground

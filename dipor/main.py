@@ -5,6 +5,7 @@ import os
 import pathlib
 from pathlib import Path
 import sys
+import shutil
 
 from dipor.readers.markdown import MarkdownReader
 from dipor.utils.context import get_structural_context
@@ -119,6 +120,17 @@ def builder(current_app_path, current_content_path, public_folder, initial_conte
             loaded_tpl.stream(**total_ctx).dump(os.path.join(res_dir, 'index.html'))
             print(f"rendered file..................{res_dir}/index.html")
 
+        current_sub_path = os.path.relpath(current_app_path, src_path)
+        res_dir = os.path.join(public_folder, current_sub_path)
+        if os.path.exists(os.path.join(current_app_path, '_assets')) and os.path.isdir(os.path.join(current_app_path, '_assets')):
+            if os.path.exists(os.path.join(res_dir, "_assets")):
+                shutil.rmtree(os.path.join(res_dir, "_assets"))
+            shutil.copytree(os.path.join(current_app_path, '_assets'), os.path.join(res_dir, '_assets'))
+        if os.path.exists(os.path.join(current_app_path, '_extras'))  and os.path.isdir(os.path.join(current_app_path, '_extras')):
+            if os.path.exists(os.path.join(res_dir, "_extras")):
+                shutil.rmtree(os.path.join(res_dir, "_extras"))
+            shutil.copytree(os.path.join(current_app_path, '_extras'), os.path.join(res_dir, '_extras'))
+
     
     if is_branch:
         return # do not look for further dirs
@@ -155,4 +167,12 @@ def builder_main(current_app_path, current_content_path, settings_path_user, pub
     settings_tmp = dipor_settings.instance
     settings = { key: settings_tmp[key] for key in settings_tmp.keys() if key.startswith("DIPOR_")}
     STRUCTURAL_CTX = get_structural_context(settings['DIPOR_PREFIX'], settings['DIPOR_INITIAL_APP'], settings['DIPOR_CONTENT_ROOT'])
+    # copy common assets to public
+    src_common_assets_path = os.path.join(src_path, "_common", "_assets")
+    dest_common_assets_path = os.path.join(public_folder, "_common", "_assets") 
+    if os.path.exists(src_common_assets_path):
+        if os.path.exists(dest_common_assets_path):
+            shutil.rmtree(dest_common_assets_path)
+        shutil.copytree(src_common_assets_path, dest_common_assets_path)
+    
     builder(src_path, content_path, public_folder)

@@ -47,10 +47,11 @@ def process_paths(directory, overridden_route_names, prefix="", is_subpath=False
     if is_subpath:
         return route_dir
 
-    if "/" in overridden_route_names.keys():
-        final_route = {'/': (overridden_route_names["/"], route_dir)}
-    else:
-        final_route = {'/': ('home', route_dir)}
+    # if "/" in overridden_route_names.keys():
+    #     final_route = {'/': (overridden_route_names["/"], route_dir)}
+    # else:
+    #     final_route = {'/': ('home', route_dir)}
+    final_route = route_dir
     return final_route
 
         

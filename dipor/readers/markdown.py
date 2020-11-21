@@ -15,7 +15,7 @@ class MarkdownReader(BaseReader):
 
     def get_context(self):
         md_file = self.read_md()
-        md = markdown.Markdown(extensions=['meta', 'codehilite', AddDivClassExtension()])
+        md = markdown.Markdown(extensions=['meta', 'codehilite', 'fenced_code', AddDivClassExtension()], extras=['fenced-code-blocks'])
         ctx = {}
         md_content = md.convert(md_file)
         if md_content:
